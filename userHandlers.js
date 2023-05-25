@@ -47,8 +47,30 @@ const createUser = async (req, res) => {
     }
   };
 
+  const updateUser = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    const { firstname, lastname, email, city, language } = req.body;
+  
+    try {
+      const [result] = await database.query(
+        "UPDATE users SET firstname = ?, lastname = ?, email = ?, city = ?, language = ? WHERE id = ?",
+        [firstname, lastname, email, city, language, userId]
+      );
+  
+      if (result.affectedRows === 0) {
+        res.status(404).send("Not Found");
+      } else {
+        res.sendStatus(204);
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).send("Error updating the user");
+    }
+  };
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
+  updateUser
 };
