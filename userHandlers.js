@@ -1,5 +1,7 @@
 const database = require("./database");
 
+
+
 const getUsers = async (req, res) => {
     let sql = "SELECT * FROM users";
     const sqlValues = [];
