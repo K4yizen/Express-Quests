@@ -1,14 +1,37 @@
 const database = require("./database");
 
 const getUsers = async (req, res) => {
-  try {
-    const [rows] = await database.query("SELECT * FROM users");
-    res.status(200).json(rows);
-  } catch (error) {
-    console.error("Error fetching users from the database:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
+    let sql = "SELECT * FROM users";
+    const sqlValues = [];
+  
+    if (req.query.language != null) {
+      sql += " WHERE language = ?";
+      sqlValues.push(req.query.language);
+    }
+  
+    if (req.query.city != null) {
+      if (sqlValues.length > 0) {
+        sql += " AND city = ?";
+      } else {
+        sql += " WHERE city = ?";
+      }
+      sqlValues.push(req.query.city);
+    }
+  
+    try {
+      const [users] = await database.query(sql, sqlValues);
+  
+      if (users.length === 0) {
+        // Si la liste est vide, renvoie une réponse 200 avec un tableau vide
+        res.status(200).json([]);
+      } else {
+        res.status(200).json(users);
+      }
+    } catch (error) {
+      console.error("Error retrieving data from database:", error);
+      res.status(500).send("Error retrieving data from database");
+    }
+}
 
 const getUserById = async (req, res) => {
   const userId = req.params.id;
@@ -85,6 +108,7 @@ const createUser = async (req, res) => {
         res.status(500).send("Error deleting the user");
       });
   };
+
 
 module.exports = {
   getUsers,
