@@ -28,7 +28,27 @@ const getUserById = async (req, res) => {
   }
 };
 
+const createUser = async (req, res) => {
+    const { firstname, lastname, email, city, language } = req.body;
+  
+    try {
+        const [result] = await database.query("INSERT INTO users (firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)", [firstname, lastname, email, city, language]);
+  
+      // Récupérez l'ID du nouvel utilisateur inséré
+      const newUserId = result.insertId;
+  
+      // Créez l'objet de réponse avec les détails de l'utilisateur créé
+      const newUser = { id: newUserId, firstname, lastname, email, city, language};
+  
+      res.status(201).json(newUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+
 module.exports = {
   getUsers,
   getUserById,
+  createUser,
 };
