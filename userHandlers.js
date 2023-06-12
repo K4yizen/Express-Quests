@@ -3,7 +3,7 @@ const database = require("./database");
 
 
 const getUsers = async (req, res) => {
-    let sql = "SELECT * FROM users";
+    let sql = "SELECT firstname, lastname, email, city, language FROM users";
     const sqlValues = [];
   
     if (req.query.language != null) {
@@ -54,32 +54,33 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-    const { firstname, lastname, email, city, language } = req.body;
+    const { firstname, lastname, email, city, language, hashedPassword } = req.body;
   
     try {
-        const [result] = await database.query("INSERT INTO users (firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)", [firstname, lastname, email, city, language]);
+        const [result] = await database.query("INSERT INTO users (firstname, lastname, email, city, language, hashedPassword) VALUES (?, ?, ?, ?, ?, ?)", [firstname, lastname, email, city, language, hashedPassword]);
   
-      // Récupérez l'ID du nouvel utilisateur inséré
+      // Récupérez l'ID du nouvel utilisateur inséré 
       const newUserId = result.insertId;
   
       // Créez l'objet de réponse avec les détails de l'utilisateur créé
-      const newUser = { id: newUserId, firstname, lastname, email, city, language};
+      const newUser = { id: newUserId, firstname, lastname, email, city, language, hashedPassword};
   
       res.status(201).json(newUser);
     } catch (error) {
       console.error("Error creating user:", error);
+      console.error(req.body)
       res.status(500).json({ message: "Internal Server Error" });
     }
   };
 
   const updateUser = async (req, res) => {
     const userId = parseInt(req.params.id);
-    const { firstname, lastname, email, city, language } = req.body;
+    const { firstname, lastname, email, city, language, hashedPassword } = req.body;
   
     try {
       const [result] = await database.query(
-        "UPDATE users SET firstname = ?, lastname = ?, email = ?, city = ?, language = ? WHERE id = ?",
-        [firstname, lastname, email, city, language, userId]
+        "UPDATE users SET firstname = ?, lastname = ?, email = ?, city = ?, language = ?, hashedPassword = ? WHERE id = ?",
+        [firstname, lastname, email, city, language, hashedPassword, userId]
       );
   
       if (result.affectedRows === 0) {

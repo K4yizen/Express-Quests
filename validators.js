@@ -19,7 +19,7 @@ const validateMovie = (req, res, next) => {
       "string.empty": "This field is required",
     }),
   });
-
+ 
   const { error } = schema.validate(req.body);
 
   if (error) {
@@ -50,9 +50,21 @@ const validateUser = (req, res, next) => {
       "string.empty": "This field is required",
       "string.max": "Should contain less than 255 characters",
     }),
+    city: Joi.string().required().messages({
+      "string.empty": "This field is required",
+    }),
+    language: Joi.string().required().messages({
+      "string.empty": "This field is required",
+    }),
+    password: Joi.string().required().messages({
+      "string.empty": "This field is required",
+      "string.password": "This field is required",
+
+    }),
+   
   });
 
-  const { error } = schema.validate(req.body);
+  const { error } = schema.validate(req.body,{abortEarly:false});
 
   if (error) {
     const validationErrors = error.details.map((err) => {
